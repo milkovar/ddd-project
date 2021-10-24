@@ -7,16 +7,15 @@ import javax.persistence.Embeddable;
 import java.time.LocalDate;
 
 @Embeddable
-public class Date implements ValueObject {
+public class CostumeDate implements ValueObject {
 
     private final String date;
 
-    public Date() {
+    public CostumeDate() {
         this.date = "";
     }
 
-    public Date(@NonNull LocalDate localDate) {
+    public CostumeDate(@NonNull LocalDate localDate) {
         this.date = localDate.toString();
     }
-
 }

@@ -6,4 +6,12 @@ import javax.persistence.Embeddable;
 
 @Embeddable
 public class ApartmentId extends DomainObjectId {
+
+    private ApartmentId(){
+        super(ApartmentId.randomId(ApartmentId.class).getId());
+    }
+
+    protected ApartmentId(String uuid) {
+        super(uuid);
+    }
 }

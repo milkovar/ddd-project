@@ -1,13 +1,13 @@
 package mk.ukim.finki.emt.apartmentcatalog.domain.valueObjects;
 
 import lombok.Getter;
-import lombok.NonNull;
 import mk.ukim.finki.emt.sharedkarnel.domain.base.ValueObject;
-import mk.ukim.finki.emt.sharedkarnel.domain.date.Date;
+import mk.ukim.finki.emt.sharedkarnel.domain.date.CostumeDate;
 
 import javax.persistence.Embeddable;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,34 +20,39 @@ public class AvailableDates implements ValueObject {
     /**
      * Constructor for initializing a list of dates.
      */
-    public AvailableDates() {
-        this.dates = new ArrayList<>();
-        setupAvailableDates();
+    public AvailableDates(Date from, Date to) {
+        dates = listAllDates(from, to);
     }
 
     /**
-     * Removes all dates that have been reserved and returns object of {@link AvailableDates}
-     * with list of dates that are available for reservation in future.
+     * Removes all dates that have been reserved and returns list of {@link Date}
+     * that are available for reservation in future.
      *
-     * @param reservedDates reserved dates.
+     * @param from starting date of the reservation.
+     * @param to ending date of the reservation.
      * @return {@link AvailableDates}.
      */
-    public AvailableDates reserveAvailableDates(List<Date> reservedDates){
-        AvailableDates availableDates = new AvailableDates();
-        availableDates.getDates().removeAll(reservedDates);
+    public AvailableDates reserveAvailableDates(Date from, Date to){
+        AvailableDates availableDates = new AvailableDates(from, to);
+        availableDates
+                .getDates()
+                .removeAll(listAllDates(from, to));
         return availableDates;
     }
 
     /**
-     * Fills the list with sequential dates starting from the current date to 2050.
+     * Returns list of all dates for given start and end date.
+     *
+     * @param startDate start date.
+     * @param endDate end date.
+     * @return list of {@link CostumeDate}.
      */
-    private void setupAvailableDates() {
-        List<LocalDate> localDates =
-                LocalDate.now()
-                        .datesUntil(LocalDate.of(2050, 1,5))
-                        .collect(Collectors.toList());
-        localDates
-                .forEach(date -> dates.add(new Date(date)));
+    private List<Date> listAllDates(Date startDate, Date endDate) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        return LocalDate.ofInstant(startDate.toInstant(), zoneId)
+                .datesUntil(LocalDate.ofInstant(endDate.toInstant(), zoneId))
+                .map(ld -> Date.from(ld.atStartOfDay(zoneId).toInstant()))
+                .collect(Collectors.toList());
     }
 
 }

@@ -8,4 +8,8 @@ public class User extends AbstractEntity<UserId> implements ValueObject{
     private String password;
     private String email;
     private String phone;
+
+    public User(){
+        super(DomainObjectId.randomId(UserId.class));
+    }
 }
